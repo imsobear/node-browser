@@ -1,0 +1,38 @@
+{
+  "name": "node-browser",
+  "version": "0.0.1",
+  "description": "wrapper webdriver by nodejs.",
+  "main": "index.js",
+  "scripts": {
+    "install": "node ./build.js",
+    "test": "node ./node_modules/.bin/_mocha test/**/*.test.js --reporter spec --timeout 20000",
+    "cov": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- test/**/*.test.js --reporter spec --timeout 20000",
+    "ci": "npm run cov"
+  },
+  "keywords": [
+    "webdriver",
+    "browser"
+  ],
+  "author": "sobear.me@gmail.com",
+  "repository": "imsobear/node-browser",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^2.9.14",
+    "chai": "~3.4.1",
+    "chalk": "~1.1.1",
+    "debug": "^2.2.0",
+    "download": "~3.3.0",
+    "fs-extra": "^0.26.2",
+    "get-port": "~2.1.0",
+    "lodash": "~2.4.1",
+    "request": "~2.51.0",
+    "rimraf": "^2.4.4",
+    "tar.gz": "^1.0.2",
+    "unzip": "^0.1.11"
+  },
+  "devDependencies": {
+    "istanbul": "*",
+    "mocha": "~2.1.0",
+    "should": "~4.6.3"
+  }
+}
