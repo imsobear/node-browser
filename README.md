@@ -1,4 +1,5 @@
-# node-browser
+# node-browser [![Build Status](https://travis-ci.org/imsobear/node-browser.svg?branch=master)](https://travis-ci.org/imsobear/node-browser) [![Coverage Status](https://coveralls.io/repos/imsobear/node-browser/badge.svg?branch=master)](https://coveralls.io/r/imsobear/node-browser?branch=master)
+
 
 > wrap webdriver by nodejs promise API, support chrome and phantomjs.
 
