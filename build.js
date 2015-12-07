@@ -6,13 +6,12 @@ var path = require('path');
 var fs = require('fs');
 var rimraf = require('rimraf');
 var Download = require('download');
-var targz = require('tar.gz');
-var unzip = require('unzip');
+var Decompress = require('decompress');
 var fse = require('fs-extra');
 var debug = require('debug')('browser');
 
 var chromeVersion = '2.20';
-var phantomVersion = '1.9.8';
+var phantomVersion = '1.9.7';
 var basePath = 'http://npm.taobao.org/mirrors/';
 var driversDest = path.resolve(__dirname, './driver');
 
@@ -53,7 +52,7 @@ function downloadDrivers() {
       // extract: true
     });
 
-    debug('download', item)
+    debug('download', item);
 
     download
       .get(basePath + item.url)
@@ -66,97 +65,54 @@ function downloadDrivers() {
         }
 
         var downloadFilePath = files[0].path;
-        var filename = path.basename(files[0].path);
-
+        var compressDir = path.resolve(driversDest, './' + item.name + '-dir');
         debug('下载完一个文件：', downloadFilePath, '开始压缩：');
 
-        uncompressed(downloadFilePath, driversDest, function(err) {
+        new Decompress({mode: '777'})
+          .src(downloadFilePath)
+          .dest(compressDir)
+          .use(Decompress.zip({strip: 1}))
+          .run(function(err) {
 
-          if (err) {
-            throw err;
-          }
+            if (err) {
+              throw err;
+            }
 
-          debug('压缩完一个文件');
+            debug('压缩完一个文件');
 
-          try {
-            reworkDest(downloadFilePath, filename);
-          } catch (err) {
-            throw err;
-          }
+            var type = /phantom/.test(item.name) ? 'phantomjs' : 'chromedriver';
+            reworkDest(downloadFilePath, compressDir, type);
 
-          debug('更改文件权限');
-          fs.chmodSync(path.resolve(driversDest, './' + item.name), '777');
+            debug('更改文件权限');
+            fs.chmodSync(path.resolve(driversDest, item.name), '777');
 
-          count ++;
+            count ++;
+            if (count >= driverConfig.length) {
+              console.log('Download drivers successfully.');
+            }
 
-          if (count >= driverConfig.length) {
-            console.log('Download drivers successfully.');
-          }
-
-        });
+          });
       });
   });
-}
-
-
-/**
- * 解压 zip 或者 tar
- */
-function uncompressed(filePath, destDir, callback) {
-
-  if (/\.zip$/.test(filePath)) {
-
-    var rs = fs.createReadStream(filePath).pipe(unzip.Extract({
-      path: destDir
-    }));
-
-    setTimeout(function() {
-      callback(null);
-    }, 5 * 1000);
-
-    // rs.on('end', function() {
-    //   debug('readStream end', filePath);
-    //   callback(null);
-    // });
-
-  } else {
-    // tar
-    targz().extract(filePath, destDir, function(err) {
-
-      if (err) {
-        return callback(err);
-      }
-      callback(null);
-    });
-  }
 }
 
 /**
  * 解压之后对文件夹重新整理
  */
-function reworkDest(uncompressedPath, filename) {
-
-  var realName = filename.replace(/(\..[^\.]*)$/, '');
-  var postfix = process.platform === 'win32' ? '.exe' : '-' + process.platform;
+function reworkDest(downloadFilePath, compressDir, type) {
 
   // 清理下载的压缩文件
-  fse.removeSync(uncompressedPath);
+  fse.removeSync(downloadFilePath);
 
-  // 把 phantomjs 移动出来
-  if (/phantomjs/.test(filename)) {
+  var binName = type + (process.platform === 'win32' ? '.exe' : '-' + process.platform);
+  var binSrcPath = path.resolve(compressDir, type === 'phantomjs' ? './bin/phantomjs' : './chromedriver');
+  var binDestPath = path.resolve(driversDest, binName);
 
-    // 去除后缀
-    var phantomDir = uncompressedPath.replace(/(\..[^\.]*)$/, '');
+  debug('复制 bin 文件：', binSrcPath, binDestPath);
+  fse.copySync(binSrcPath, binDestPath);
 
-    debug('复制 bin/phantomjs: ', realName, phantomDir);
-    fse.copySync(path.resolve(phantomDir, './bin/phantomjs'), path.resolve(driversDest, './phantomjs' + postfix));
-
-    debug('移除 phantomjs 的文件夹');
-    fse.removeSync(phantomDir);
-
-  } else {
-    fs.renameSync(path.resolve(driversDest, './chromedriver'), path.resolve(driversDest, './chromedriver' + postfix));
-  }
+  debug('移除源的文件夹');
+  fse.removeSync(compressDir);
 
 }
 

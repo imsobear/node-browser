@@ -1,6 +1,6 @@
 {
   "name": "node-browser",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "wrapper webdriver by nodejs.",
   "main": "index.js",
   "scripts": {
@@ -21,14 +21,13 @@
     "chai": "~3.4.1",
     "chalk": "~1.1.1",
     "debug": "^2.2.0",
+    "decompress": "~3.0.0",
     "download": "~3.3.0",
     "fs-extra": "^0.26.2",
     "get-port": "~2.1.0",
     "lodash": "~2.4.1",
     "request": "~2.51.0",
-    "rimraf": "^2.4.4",
-    "tar.gz": "^1.0.2",
-    "unzip": "^0.1.11"
+    "rimraf": "^2.4.4"
   },
   "devDependencies": {
     "istanbul": "*",
