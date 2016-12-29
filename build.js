@@ -12,7 +12,7 @@ var debug = require('debug')('browser');
 
 var chromeVersion = '2.20';
 var phantomVersion = '1.9.7';
-var basePath = 'http://npm.taobao.org/mirrors/';
+var basePath = 'https://cnpmjs.org/mirrors/';
 var driversDest = path.resolve(__dirname, './driver');
 
 /**
@@ -105,7 +105,9 @@ function reworkDest(downloadFilePath, compressDir, type) {
   fse.removeSync(downloadFilePath);
 
   var binName = type + (process.platform === 'win32' ? '.exe' : '-' + process.platform);
-  var binSrcPath = path.resolve(compressDir, type === 'phantomjs' ? './bin/phantomjs' : './chromedriver');
+  var chromeDriverFileName = './chromedriver' + (process.platform === 'win32' ? '.exe' : '');
+  var phantomDriverFileName = (process.platform === 'win32' ? 'phantomjs.exe' : './bin/phantomjs');
+  var binSrcPath = path.resolve(compressDir, type === 'phantomjs' ? phantomDriverFileName : chromeDriverFileName );
   var binDestPath = path.resolve(driversDest, binName);
 
   debug('复制 bin 文件：', binSrcPath, binDestPath);
