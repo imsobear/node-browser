@@ -12,7 +12,7 @@ var debug = require('debug')('browser');
 
 var chromeVersion = '2.20';
 var phantomVersion = '1.9.7';
-var basePath = 'http://npm.taobao.org/mirrors/';
+var basePath = 'https://npm.taobao.org/mirrors/';
 var driversDest = path.resolve(__dirname, './driver');
 
 /**
